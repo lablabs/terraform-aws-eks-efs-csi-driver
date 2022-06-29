@@ -22,7 +22,7 @@ variable "helm_chart_name" {
 
 variable "helm_chart_version" {
   type        = string
-  default     = "2.2.6"
+  default     = "2.2.7"
   description = "Version of the Helm chart"
 }
 
@@ -62,7 +62,7 @@ variable "irsa_role_create" {
 
 variable "irsa_role_name_prefix" {
   type        = string
-  default     = "efs-csi-controller-irsa"
+  default     = "efs-csi-controller"
   description = "The IRSA role name prefix for EFS csi controller"
 }
 
@@ -70,6 +70,12 @@ variable "irsa_policy_enabled" {
   type        = bool
   default     = true
   description = "Whether to create opinionated policy for EFS csi controller, see https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/docs/iam-policy-example.json"
+}
+
+variable "irsa_additional_policies" {
+  type        = map(string)
+  default     = {}
+  description = "Map of the additional policies to be attached to default role. Where key is arbiraty id and value is policy arn."
 }
 
 variable "irsa_tags" {
@@ -102,7 +108,7 @@ variable "argo_namespace" {
   description = "Namespace to deploy ArgoCD application CRD to"
 }
 
-variable "argo_destionation_server" {
+variable "argo_destination_server" {
   type        = string
   default     = "https://kubernetes.default.svc"
   description = "Destination server for ArgoCD Application"
@@ -128,7 +134,11 @@ variable "argo_sync_policy" {
 }
 
 variable "argo_metadata" {
-  default     = {}
+  default = {
+    "finalizers" : [
+      "resources-finalizer.argocd.argoproj.io"
+    ]
+  }
   description = "ArgoCD Application metadata configuration. Override or create additional metadata parameters"
 }
 
@@ -159,7 +169,7 @@ variable "argo_kubernetes_manifest_field_manager_force_conflicts" {
   description = "Forcibly override any field manager conflicts when applying the kubernetes manifest resource"
 }
 
-variable "argo_kubernetes_manifest_wait_for_fields" {
+variable "argo_kubernetes_manifest_wait_fields" {
   type        = map(string)
   default     = {}
   description = "A map of fields and a corresponding regular expression with a pattern to wait for. The provider will wait until the field matches the regular expression. Use * for any value."
@@ -350,8 +360,3 @@ variable "helm_lint" {
   default     = false
   description = "Run the helm chart linter during the plan"
 }
-
-# variable "efs_filesystem_id" {
-#   type        = string
-#   description = "File system id for EFS CSI driver"
-# }
