@@ -62,7 +62,7 @@ variable "irsa_role_create" {
 
 variable "irsa_role_name_prefix" {
   type        = string
-  default     = "efs-csi-controller-irsa"
+  default     = "efs-csi-controller"
   description = "The IRSA role name prefix for EFS csi controller"
 }
 
@@ -360,8 +360,3 @@ variable "helm_lint" {
   default     = false
   description = "Run the helm chart linter during the plan"
 }
-
-# variable "efs_filesystem_id" {
-#   type        = string
-#   description = "File system id for EFS CSI driver"
-# }
