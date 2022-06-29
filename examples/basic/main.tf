@@ -39,14 +39,66 @@ module "efs_csi_disabled" {
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
-
 }
 
-
-module "efs_csi_enabled" {
+module "efs_csi_helm" {
   source = "../../"
+
+  enabled           = true
+  argo_enabled      = false
+  argo_helm_enabled = false
 
   cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
   cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
 
+  helm_release_name = "aws-efs-csi-helm"
+  namespace         = "aws-efs-csi-helm"
+
+  values = yamlencode({
+    "podLabels" : {
+      "app" : "aws-efs-csi-helm"
+    }
+  })
+
+  helm_timeout = 240
+  helm_wait    = true
+}
+
+module "efs_csi_argo_kubernetes" {
+  source = "../../"
+
+  enabled           = true
+  argo_enabled      = true
+  argo_helm_enabled = false
+
+  cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
+  cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
+
+  helm_release_name = "aws-efs-csi-argo-kubernetes"
+  namespace         = "aws-efs-csi-argo-kubernetes"
+
+  argo_sync_policy = {
+    "automated" : {}
+    "syncOptions" = ["CreateNamespace=true"]
+  }
+}
+
+module "efs_csi_argo_helm" {
+  source = "../../"
+
+  enabled           = true
+  argo_enabled      = true
+  argo_helm_enabled = true
+
+  cluster_identity_oidc_issuer     = module.eks_cluster.eks_cluster_identity_oidc_issuer
+  cluster_identity_oidc_issuer_arn = module.eks_cluster.eks_cluster_identity_oidc_issuer_arn
+
+  helm_release_name = "aws-efs-csi-argo-helm"
+  namespace         = "aws-efs-csi-argo-helm"
+
+  argo_namespace = "argo"
+  argo_sync_policy = {
+    "automated" : {}
+    "syncOptions" = ["CreateNamespace=true"]
+  }
 }

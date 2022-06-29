@@ -29,8 +29,10 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_efs_csi_argo_helm"></a> [efs\_csi\_argo\_helm](#module\_efs\_csi\_argo\_helm) | ../../ | n/a |
+| <a name="module_efs_csi_argo_kubernetes"></a> [efs\_csi\_argo\_kubernetes](#module\_efs\_csi\_argo\_kubernetes) | ../../ | n/a |
 | <a name="module_efs_csi_disabled"></a> [efs\_csi\_disabled](#module\_efs\_csi\_disabled) | ../../ | n/a |
-| <a name="module_efs_csi_enabled"></a> [efs\_csi\_enabled](#module\_efs\_csi\_enabled) | ../../ | n/a |
+| <a name="module_efs_csi_helm"></a> [efs\_csi\_helm](#module\_efs\_csi\_helm) | ../../ | n/a |
 | <a name="module_eks_cluster"></a> [eks\_cluster](#module\_eks\_cluster) | cloudposse/eks-cluster/aws | 0.45.0 |
 | <a name="module_eks_node_group"></a> [eks\_node\_group](#module\_eks\_node\_group) | cloudposse/eks-node-group/aws | 0.28.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 3.13.0 |
