@@ -95,3 +95,10 @@ resource "aws_iam_role_policy_attachment" "this" {
   role       = aws_iam_role.this[0].name
   policy_arn = aws_iam_policy.this[0].arn
 }
+
+resource "aws_iam_role_policy_attachment" "additional" {
+  for_each = local.irsa_role_create ? var.irsa_additional_policies : {}
+
+  role       = aws_iam_role.this[0].name
+  policy_arn = each.value
+}

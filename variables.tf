@@ -72,6 +72,12 @@ variable "irsa_policy_enabled" {
   description = "Whether to create opinionated policy for EFS csi controller, see https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/docs/iam-policy-example.json"
 }
 
+variable "irsa_additional_policies" {
+  type        = map(string)
+  default     = {}
+  description = "Map of the additional policies to be attached to default role. Where key is arbiraty id and value is policy arn."
+}
+
 variable "irsa_tags" {
   type        = map(string)
   default     = {}
