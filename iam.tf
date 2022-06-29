@@ -7,6 +7,8 @@ data "aws_iam_policy_document" "this" {
   count = local.irsa_role_create && var.irsa_policy_enabled ? 1 : 0
 
   statement {
+    effect    = "Allow"
+
     actions = [
       "elasticfilesystem:DescribeAccessPoints",
       "elasticfilesystem:DescribeFileSystems",
@@ -14,17 +16,17 @@ data "aws_iam_policy_document" "this" {
       "ec2:DescribeAvailabilityZones"
     ]
     resources = ["*"]
-    effect    = "Allow"
   }
 
   statement {
+    #checkov:skip=CKV_AWS_111 there is correct condition for existing Tags
+    # Official documentation https://raw.githubusercontent.com/kubernetes-sigs/aws-efs-csi-driver/v1.3.7/docs/iam-policy-example.json
+    effect = "Allow"
+
     actions = [
       "elasticfilesystem:CreateAccessPoint"
     ]
     resources = ["*"]
-    #checkov:skip=CKV_AWS_111 there is correct condition for existing Tags
-    # Official documentation https://raw.githubusercontent.com/kubernetes-sigs/aws-efs-csi-driver/v1.3.7/docs/iam-policy-example.json
-    effect = "Allow"
     condition {
       test     = "StringLike"
       variable = "aws:RequestTag/efs.csi.aws.com/cluster"
@@ -33,11 +35,13 @@ data "aws_iam_policy_document" "this" {
   }
 
   statement {
+    effect    = "Allow"
+
     actions = [
       "elasticfilesystem:DeleteAccessPoint"
     ]
     resources = ["*"]
-    effect    = "Allow"
+
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/efs.csi.aws.com/cluster"
@@ -60,6 +64,8 @@ data "aws_iam_policy_document" "this_assume" {
   count = local.irsa_role_create ? 1 : 0
 
   statement {
+    effect = "Allow"
+
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
     principals {
@@ -75,8 +81,6 @@ data "aws_iam_policy_document" "this_assume" {
         "system:serviceaccount:${var.namespace}:${var.service_account_name}",
       ]
     }
-
-    effect = "Allow"
   }
 }
 
