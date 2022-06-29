@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "this" {
   count = local.irsa_role_create && var.irsa_policy_enabled ? 1 : 0
 
   statement {
-    effect    = "Allow"
+    effect = "Allow"
 
     actions = [
       "elasticfilesystem:DescribeAccessPoints",
@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "this" {
   }
 
   statement {
-    effect    = "Allow"
+    effect = "Allow"
 
     actions = [
       "elasticfilesystem:DeleteAccessPoint"
