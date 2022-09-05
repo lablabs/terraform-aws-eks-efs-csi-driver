@@ -1,4 +1,4 @@
-# AWS EKS keda Terraform module
+# AWS EKS EFS CSI driver Terraform module
 
 [![labyrinth labs logo](ll-logo.png)](https://lablabs.io/)
 
@@ -11,7 +11,7 @@ We help companies build, run, deploy and scale software and infrastructure by em
 
 ## Description
 
-A terraform module to deploy the AWS keda on Amazon EKS cluster.
+A terraform module to deploy the AWS EFS CSI driver on Amazon EKS cluster.
 
 ## Related Projects
 
