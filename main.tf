@@ -1,37 +1,48 @@
 /**
- * # AWS EKS Universal Addon Terraform module
+ * # AWS EKS EFS CSI driver Terraform module
  *
- * A Terraform module to deploy the universal addon on Amazon EKS cluster.
+ * A terraform module to deploy the [AWS EFS CSI driver](https://github.com/kubernetes-sigs/aws-efs-csi-driver/) on Amazon EKS cluster.
  *
- * [![Terraform validate](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/validate.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/validate.yaml)
- * [![pre-commit](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/pre-commit.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-universal-addon/actions/workflows/pre-commit.yaml)
+ * [![Terraform validate](https://github.com/lablabs/terraform-aws-eks-efs-csi-driver/actions/workflows/validate.yaml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-efs-csi-driver/actions/workflows/validate.yaml)
+ * [![pre-commit](https://github.com/lablabs/terraform-aws-eks-efs-csi-driver/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/lablabs/terraform-aws-eks-efs-csi-driver/actions/workflows/pre-commit.yml)
  */
-# FIXME config: update addon docs above
-locals {
-  # FIXME config: add addon configuration here
-  addon = {
-    name = "universal-addon"
 
-    helm_chart_name    = "raw"
-    helm_chart_version = "0.1.0"
-    helm_repo_url      = "https://lablabs.github.io"
+locals {
+  addon = {
+    name = "aws-efs-csi-driver"
+    namespace = "kube-system"
+
+    helm_chart_name    = "aws-efs-csi-driver"
+    helm_chart_version = "3.1.5"
+    helm_repo_url      = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
   }
 
-  # FIXME config: add addon IRSA configuration here or remove if not needed
   addon_irsa = {
     (local.addon.name) = {
-      # FIXME config: add default IRSA overrides here or leave empty if not needed, but make sure to keep at least one key
-    }
-  }
-
-  # FIXME config: add addon OIDC configuration here or remove if not needed
-  addon_oidc = {
-    (local.addon.name) = {
-      # FIXME config: add default OIDC overrides here or leave empty if not needed, but make sure to keep at least one key
+      irsa_role_name_prefix = var.irsa_role_name_prefix != null ? var.irsa_role_name_prefix : "efs-csi-controller"
+      irsa_policy = var.irsa_policy != null ? var.irsa_policy : data.aws_iam_policy_document.this[0].json
+      irsa_policy_enabled = var.irsa_policy_enabled != null ? var.irsa_policy_enabled : true
     }
   }
 
   addon_values = yamlencode({
-    # FIXME config: add default values here
+    controller = {
+      serviceAccount = {
+        create = var.service_account_create != null ? var.service_account_create : true 
+        name = var.service_account_name != null ? var.service_account_name : local.addon.name
+        annotations = module.addon-irsa[local.addon.name].irsa_role_enabled ? {
+          "eks.amazonaws.com/role-arn" = module.addon-irsa[local.addon.name].iam_role_attributes.arn
+        } : tomap({})
+      }
+    }
+    node = {
+      serviceAccount = {
+        create = false
+        name = var.service_account_name != null ? var.service_account_name : local.addon.name
+        annotations = module.addon-irsa[local.addon.name].irsa_role_enabled ? {
+          "eks.amazonaws.com/role-arn" = module.addon-irsa[local.addon.name].iam_role_attributes.arn 
+        } : tomap({})
+      }
+    }
   })
-}
+}  
