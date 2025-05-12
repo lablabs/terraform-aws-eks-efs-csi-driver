@@ -9,7 +9,7 @@
 
 locals {
   addon = {
-    name = "aws-efs-csi-driver"
+    name = "efs-csi-driver"
     namespace = "kube-system"
 
     helm_chart_name    = "aws-efs-csi-driver"
@@ -19,17 +19,17 @@ locals {
 
   addon_irsa = {
     (local.addon.name) = {
-      irsa_role_name_prefix = var.irsa_role_name_prefix != null ? var.irsa_role_name_prefix : "efs-csi-controller"
-      irsa_policy = var.irsa_policy != null ? var.irsa_policy : data.aws_iam_policy_document.this[0].json
-      irsa_policy_enabled = var.irsa_policy_enabled != null ? var.irsa_policy_enabled : true
+      irsa_role_name_prefix = var.irsa_role_name_prefix != null ? var.irsa_role_name_prefix : local.addon.name
+      irsa_policy_enabled   = local.irsa_policy_enabled
+      irsa_policy           = var.irsa_policy != null ? var.irsa_policy : data.aws_iam_policy.this[0].policy
     }
   }
 
   addon_values = yamlencode({
     controller = {
       serviceAccount = {
-        create = var.service_account_create != null ? var.service_account_create : true 
-        name = var.service_account_name != null ? var.service_account_name : local.addon.name
+        create = var.service_account_create != null ? var.service_account_create : true
+        name   = var.service_account_name != null ? var.service_account_name : local.addon.name
         annotations = module.addon-irsa[local.addon.name].irsa_role_enabled ? {
           "eks.amazonaws.com/role-arn" = module.addon-irsa[local.addon.name].iam_role_attributes.arn
         } : tomap({})
@@ -38,9 +38,9 @@ locals {
     node = {
       serviceAccount = {
         create = false
-        name = var.service_account_name != null ? var.service_account_name : local.addon.name
+        name   = var.service_account_name != null ? var.service_account_name : local.addon.name
         annotations = module.addon-irsa[local.addon.name].irsa_role_enabled ? {
-          "eks.amazonaws.com/role-arn" = module.addon-irsa[local.addon.name].iam_role_attributes.arn 
+          "eks.amazonaws.com/role-arn" = module.addon-irsa[local.addon.name].iam_role_attributes.arn
         } : tomap({})
       }
     }
