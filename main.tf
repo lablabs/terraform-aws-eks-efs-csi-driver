@@ -9,7 +9,7 @@
 
 locals {
   addon = {
-    name = "efs-csi-driver"
+    name      = "efs-csi-driver"
     namespace = "kube-system"
 
     helm_chart_name    = "aws-efs-csi-driver"
@@ -45,4 +45,4 @@ locals {
       }
     }
   })
-}  
+}
